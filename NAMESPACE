@@ -1,0 +1,19 @@
+import(methods,  Biobase, survival)
+importFrom(stats, coefficients, coef, fitted, fitted.values, residuals, time,
+           weights, predict)
+importFrom(graphics, plot)
+importFrom(graphics, boxplot)
+#importFrom(uniCox, predict.uniCox, uniCox, uniCoxCV)
+importFrom(penalized, penalized, coefficients, basehaz, optL1, optL2)
+importClassesFrom(penalized, penfit, breslow)
+#importClassesFrom(uniCox,uniCoxFit)
+importMethodsFrom(penalized, "[", "[[", as.data.frame, as.list, as.matrix, 
+                  plot, show, survival, fitted)
+
+exportClasses("gsagenesets", "gsaresults")
+
+exportMethods("plot", "coxBoostSurv",
+              "penalizedSurv", "uniCoxSurv", "plusMinusSurv", "superPcSurv",
+              "gsaWilcoxSurv", "gsaTranslateGmt")
+
+export(plusMinus, plotKM, plotKMStratifyBy, gsaReadGmt, gsaPathwayGmt)

@@ -1,0 +1,23 @@
+Package: survHDExtra
+Type: Package
+Title: Addtitional Features for package survHD
+Version: 0.1.0
+Date: 2009-09-14
+Author: Christoph Bernau <bernau@ibe.med.uni-muenchen.de>, Levi Waldron <>
+Maintainer: Christoph Bernau <bernau@ibe.med.uni-muenchen.de>
+Depends: R (>= 2.10), survHD, methods, stats, Biobase, survival,penalized, Hmisc, survC1
+Imports: BiocGenerics
+Suggests: MASS, snow, CoxBoost, randomSurvivalForest,
+	uniCox,gbm, superpc, pensim, RUnit, genefilter, limma,
+    RColorBrewer, maxstat, survcomp, lattice, hu6800.db,
+    annotate, graphite, survIDINRI
+Description: This package provides a comprehensive collection of various microarray-based survival algorithms
+             both from Machine Learning and Statistics.
+             Variable Selection, Hyperparameter tuning, Evaluation and Comparison can be performed
+             combined or stepwise in a user-friendly environment.
+Collate: plot-methods.r coxBoostSurv.r plusminuscore.r plusMinusSurv.r 
+        superPcSurv.r penalizedSurv.r uniCoxSurv.r AllClasses.r AllGenerics.r
+        plotKM.r plotKMStratifyBy.r gsa.r 
+License: GPL (>= 2)
+biocViews: Survival
+Packaged: 2011-11-01 05:21:58 UTC; biocbuild

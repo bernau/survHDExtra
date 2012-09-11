@@ -1,0 +1,77 @@
+
+%\VignetteIndexEntry{CMA Manual}
+%\VignetteKeywords{Classification}
+%\VignetteDepends{survHD}
+%\VignettePackage{survHD}
+
+\input{preamble.tex}
+\title{\Huge{{\bf survHDExtra}}\\ package vignette}
+\author{Christoph Bernau \footnote{\url{bernau@ibe.med.uni-muenchen.de}}\\
+        Levi Waldron \footnote{\url{lwaldron.research@gmail.com}}\\
+      Markus Riester\footnote{\url{markus@jimmy.harvard.edu}}}
+
+\begin{document}
+\date{2012}
+
+
+\maketitle
+
+<<preliminaries,echo=FALSE,results=hide>>=
+library(survHDExtra)
+library(survHD)
+options(width=60)
+@ 
+
+
+\section{SurvHD - Survival Analysis for High-Dimensional Data (Gene Expression Data)}
+
+Survival analysis on high-dimensional data is a complex and
+computationally intensive task. Many standard algorithms for survival
+data are not applicable in the "$p>>n$"-case, e.g. with several
+thousands of variables and only hundreds of samples.  Many adaptions
+of the Cox-Model and other standard approaches for high-dimensional
+data have been developed in the last years.  Furthermore, methods for
+tuning and evaluation of models are distinct from classification
+problems.  Our R-package {\bf survHD} provides a framework for the
+application, optimization, and evaluation of high-dimensional survival
+models.  In this vignette, we will introduce the basic work flow of
+the package using a well-known cancer microarray data
+set. Additionally, we will explain the built-in interface for
+including user-defined custom survival model functions into the {\bf
+  survHD} framework.
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
