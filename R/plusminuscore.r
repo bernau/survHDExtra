@@ -70,12 +70,12 @@ plusMinus <- function( X, y, lambda=NULL, tuningpar="nfeatures",
         votingthresholds <- apply(X, 2, quantile, probs=votingthresholdquantile)
         ##If cc is zero, set threshold to zero:
         votingthresholds[abs(cc) < .Machine$double.eps ^ 0.5] <- 0
-        ret.obj <- new("linearriskscore", coefficients = cc, modeltype = modeltype, votingthresholds=votingthresholds)
+        ret.obj <- new("ModelLinear", coefficients = cc, modeltype = modeltype, votingthresholds=votingthresholds)
     }else{
         ##scale coefficients for numerical stability simply by
         ##dividing by the number of non-zero coefficients.
         cc <- cc / sum(abs(cc) > 0)
-        ret.obj <- new("linearriskscore", coefficients = cc, modeltype = modeltype)
+        ret.obj <- new("ModelLinear", coefficients = cc, modeltype = modeltype)
     }
     return(ret.obj)
 }

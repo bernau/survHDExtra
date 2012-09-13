@@ -6,7 +6,7 @@
 # Date of creation: April 5, 2012
 #
 # Brief description:
-#   Returns an object of class survoutput.
+#   Returns an object of class ModelLearned.
 #
 # Arguments:
 #   -X: matrix of variables (rows are observations,columns are variables)
@@ -16,7 +16,7 @@
 #   -unpenalizedvars: matrix of unpenalized variables
 #
 # Value:
-#   survoutput
+#   ModelLearned
 #
 ###############################################################################
 
@@ -92,7 +92,7 @@ setMethod("coxBoostSurv", signature(X = "data.frame", y = "Surv"), function(X, y
         # prune modd
     }
     
-    return( new("survoutput", y = Ylearn, linear.predictor = pred.learn, learnind = learnind, 
+    return( new("ModelLearned", y = Ylearn, linear.predictor = pred.learn, learnind = learnind, 
         method = "coxBoostSurv", model = output.coxboost) )
 })
 
@@ -119,8 +119,8 @@ setMethod("predictsurvhd", signature(object = "CoxBoostSurv", newdata = "data.fr
             survobj <- object@mod
             pred <- predict(object = survobj, type = "lp", newdata = newdata)
             pred <- structure(pred[1, ], .Names = colnames(pred))
-            pred <- new("linpred", lp = pred)
-        } else if (type == "survprobs") {
+            pred <- new("LinearPrediction", lp = pred)
+        } else if (type == "SurvivalProbs") {
             survobj <- object@mod
             if (is.null(timegrid)) {
                 stop("No timegrid specified.")
@@ -128,7 +128,7 @@ setMethod("predictsurvhd", signature(object = "CoxBoostSurv", newdata = "data.fr
             curves <- predict(object = survobj, newdata = newdata, times = timegrid, 
                 type = "risk")
             pred <- new("breslow", curves = curves, time = timegrid)
-            pred <- new("survprobs", survprobs = pred)
+            pred <- new("SurvivalProbs", SurvivalProbs = pred)
         }
 		
 		else stop('Invalid "type" argument.')

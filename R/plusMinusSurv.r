@@ -6,7 +6,7 @@
 # Date of creation: Mar 21, 2012
 #
 # Brief description:
-#   Returns an object of class survoutput.
+#   Returns an object of class ModelLearned.
 #
 # Further comments and notes:
 #   The plusminus learner assigns coefficients of +/-1 to each feature,
@@ -26,7 +26,7 @@
 #                for t-test between good and bad-prognosis genes).
 #
 # Value:
-#   survoutput
+#   ModelLearned
 #
 ###############################################################################
 
@@ -66,8 +66,8 @@ setMethod("plusMinusSurv", signature(X = "data.frame", y = "Surv"), function(X, 
         # prune output here
     }
     
-    ## survoutput should contain only method, list of the core object, learnind.
-    return( new("survoutput", y = Ylearn, linear.predictor = linear.predictor, 
+    ## ModelLearned should contain only method, list of the core object, learnind.
+    return( new("ModelLearned", y = Ylearn, linear.predictor = linear.predictor, 
         learnind = learnind, method = "plusMinusSurv", model = output) )
 })
 
@@ -85,7 +85,7 @@ setMethod("plusMinusSurv", signature(X = "ExpressionSet", y = "character"), func
     plusMinusSurv(X = Xdat, y = .fetchyFromEset(X,y), ...)
 })
 
-setMethod("predictsurvhd", signature(object = "linearriskscore", newdata = "data.frame"), 
+setMethod("predictsurvhd", signature(object = "ModelLinear", newdata = "data.frame"), 
     function(object, newdata, type="lp", timegrid = NULL, ...) {
         ll2 <- list(...)
         dropmissing <- ll2$ll$dropmissing
@@ -159,11 +159,11 @@ setMethod("predictsurvhd", signature(object = "linearriskscore", newdata = "data
                   include.lowest = TRUE)
                 pred <- as.numeric(pred)
             }
-            pred <- new("linpred", lp = pred)
-        } else if (type == "survprobs") {
+            pred <- new("LinearPrediction", lp = pred)
+        } else if (type == "SurvivalProbs") {
 			stop('Survival method does not provide an own implementation survival probability predicition. \n You could try "gbm=TRUE".')
            # warning("Coxbased survival-probability estimation (gbm set to TRUE).")
-           # predict(object, newdata, type = "survprobs", timegrid, gbm = TRUE)
+           # predict(object, newdata, type = "SurvivalProbs", timegrid, gbm = TRUE)
         }
         return(pred)
     })

@@ -13,17 +13,17 @@ testCustomSurv <- function(){
         ##call actual model function rsf from randomSurvivalForest
         output.rsf <- do.call("rsf", args = ll)
         ##define prediction function which will be stored in slot predfun
-        ##and called by predictsurvhd (signature(survhdcustom))
+        ##and called by predictsurvhd (signature(ModelCustom))
 ###
         predfun<-function(object,newdata,type,timegrid=NULL,...){
             require(randomSurvivalForest)
-            ##either type lp or type survprobs must be implemented
-            ##for typ lp the obligatory return class is linpred
+            ##either type lp or type SurvivalProbs must be implemented
+            ##for typ lp the obligatory return class is LinearPrediction
             if (type == "lp") {
                 stop("Random Forests don't provide linear predictors, sorry.")
             }
-            ##for typ survprobs the obligatory return class is Breslow
-            else if (type == "survprobs") {
+            ##for typ SurvivalProbs the obligatory return class is Breslow
+            else if (type == "SurvivalProbs") {
                 modelobj <- object@mod
                 if (is.null(timegrid)) {
                     stop("No timegrid specified.")
@@ -36,14 +36,14 @@ testCustomSurv <- function(){
                 curves<-exp(-t(apply(predsrsf$ensemble,1,FUN=function(z) approx(x=predsrsf$timeInterest,y=z,xout=timegrid)$y)))
                 ##create breslow-object
                 pred <- new("breslow", curves = curves, time = timegrid)
-                ##create survprobs-object embedding the breslow-object
-                pred <- new("survprobs", survprobs = pred)
+                ##create SurvivalProbs-object embedding the breslow-object
+                pred <- new("SurvivalProbs", SurvivalProbs = pred)
             }
             else stop('Invalid "type" argument.')
             return(pred)  
         }
         ##now create customsurvhd-object (which is the obligatory output-object)
-        custommod<-new("survhdcustom",mod=output.rsf,predfun=predfun,extraData=list())
+        custommod<-new("ModelCustom",mod=output.rsf,predfun=predfun,extraData=list())
         return(custommod)
     }
     
@@ -60,18 +60,18 @@ testCustomSurv <- function(){
     ##learningset	
     ls<-generateLearningsets(y=y[,1],method='CV',fold=3,niter=2)
     ##gene selection
-    gsel<-geneSelection(X=X,y=y,method='fastCox',learningsets=ls,criterion='coefficient')
+    gsel<-geneSelection(X=X,y=y,method='fastCox',LearningSets=ls,criterion='coefficient')
 
     ##learnsurvival	
     set.seed(1)
 ##    browser()
-    svaggr <- learnSurvival(X=X,y=y,genesel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,learningsets=ls)
+    svaggr <- learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,LearningSets=ls)
 
     ###tune
-    tuneres<-tune(X=X,y=y,genesel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,learningsets=ls,grids = list(ntree = 100*seq(1, 10, 4)))
+    tuneres<-tune(X=X,y=y,GeneSel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,LearningSets=ls,grids = list(ntree = 100*seq(1, 10, 4)))
 
 ###use tuneres in learnSurvival
-    svaggr<-learnSurvival(X=X,y=y,genesel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,learningsets=ls,tuneres=tuneres,measure="PErrC",timegrid=4:10,gbm=FALSE,addtune=list(genesel=gsel,nbgene=30))
+    svaggr<-learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=30,survmethod='customSurv',customSurvModel=customRSF,LearningSets=ls,tuneres=tuneres,measure="PErrC",timegrid=4:10,gbm=FALSE,addtune=list(GeneSel=gsel,nbgene=30))
 ###error expected because rsf does not provide lp
     expect.msg1 <- "Error in function (object, newdata, type, timegrid = NULL, ...)  : \n  Random Forests don't provide linear predictors, sorry.\n"
     expect.err1 <- try(evaluate(svaggr,measure='CvPLogL'), silent=TRUE)
@@ -113,20 +113,20 @@ testCustomSurv <- function(){
         ##call actual model function CoxBoost
         output.coxboost <- do.call("CoxBoost", args = ll)
         ##define prediction function which will be stored in slot predfun
-        ##and called by predictsurvhd (signature(survhdcustom))
+        ##and called by predictsurvhd (signature(ModelCustom))
 ###
         predfun<-function(object,newdata,type,timegrid=NULL,...){
             require(CoxBoost)
-                                        #either type lp or type survprobs must be implemented
-                                        #for typ lp the obligatory return class is linpred
+                                        #either type lp or type SurvivalProbs must be implemented
+                                        #for typ lp the obligatory return class is LinearPrediction
             if (type == "lp") {
                 survobj <- object@mod
                 pred <- predict(object = survobj, type = "lp", newdata = newdata)
                 pred <- structure(pred[1, ], .Names = colnames(pred))
-                pred <- new("linpred", lp = pred)
+                pred <- new("LinearPrediction", lp = pred)
             }
-                                        #for typ survprobs the obligatory return class is Breslow
-            else if (type == "survprobs") {
+                                        #for typ SurvivalProbs the obligatory return class is Breslow
+            else if (type == "SurvivalProbs") {
                 survobj <- object@mod
                 if (is.null(timegrid)) {
                     stop("No timegrid specified.")
@@ -134,13 +134,13 @@ testCustomSurv <- function(){
                 curves <- predict(object = survobj, newdata = newdata, times = timegrid, 
                                   type = "risk")
                 pred <- new("breslow", curves = curves, time = timegrid)
-                pred <- new("survprobs", survprobs = pred)
+                pred <- new("SurvivalProbs", SurvivalProbs = pred)
             }
             else stop('Invalid "type" argument.')
             return(pred)  
         }
         ##now create customsurvhd-object (which is the obligatory output-object)
-        custommod<-new("survhdcustom",mod=output.coxboost,predfun=predfun,extraData=list())
+        custommod<-new("ModelCustom",mod=output.coxboost,predfun=predfun,extraData=list())
         return(custommod)
     }
 ###function customSurvModel must be available in all environments!
@@ -153,53 +153,53 @@ testCustomSurv <- function(){
     ls<-generateLearningsets(y=y[,1],method='CV',fold=3,niter=2)
     
     ##gene selection
-    gsel<-geneSelection(X=X,y=y,method='fastCox',learningsets=ls,criterion='coefficient')
+    gsel<-geneSelection(X=X,y=y,method='fastCox',LearningSets=ls,criterion='coefficient')
     ##learnsurvival	
-    checkEquals(class(gsel)[1], "genesel")
+    checkEquals(class(gsel)[1], "GeneSel")
 	
     ##use learnSurvival on customSurv and coxBoostSurv, model should be identical:
     set.seed(1)
-    svaggr<-learnSurvival(X=X,y=y,genesel=gsel,nbgene=100,survmethod='customSurv',customSurvModel=customSurvModel,learningsets=ls)
-    checkEquals(class(svaggr)[1], "survaggr")
+    svaggr<-learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=100,survmethod='customSurv',customSurvModel=customSurvModel,LearningSets=ls)
+    checkEquals(class(svaggr)[1], "LearnOut")
     set.seed(1)
-    svaggr.native <- learnSurvival(X=X,y=y,genesel=gsel,nbgene=100,survmethod='coxBoostSurv',learningsets=ls)
-    for (i in 1:length(svaggr@survoutputlist)){
+    svaggr.native <- learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=100,survmethod='coxBoostSurv',LearningSets=ls)
+    for (i in 1:length(svaggr@ModelLearnedlist)){
         print(i)
-        mod <- svaggr@survoutputlist[[i]]@model@mod
-        mod.native <- svaggr.native@survoutputlist[[i]]@model@mod
+        mod <- svaggr@ModelLearnedlist[[i]]@model@mod
+        mod.native <- svaggr.native@ModelLearnedlist[[i]]@model@mod
       checkEquals(mod, mod.native) 
     }
 
     ##tune
 	
     set.seed(1)
-    tuneres<-tune(X=X,y=y,genesel=gsel,nbgene=100,
+    tuneres<-tune(X=X,y=y,GeneSel=gsel,nbgene=100,
                   survmethod='customSurv',customSurvModel=customSurvModel,
-                  learningsets=ls,
+                  LearningSets=ls,
                   grids = list(stepno = c(10 * seq(1, 10, 4))))
-    checkEquals(class(tuneres)[1], "tuningresult")
+    checkEquals(class(tuneres)[1], "TuneOut")
     set.seed(1)
-    tuneres.native <- tune(X=X,y=y,genesel=gsel,nbgene=100,
+    tuneres.native <- tune(X=X,y=y,GeneSel=gsel,nbgene=100,
                   survmethod='coxBoostSurv',
-                  learningsets=ls,
+                  LearningSets=ls,
                   grids = list(stepno = c(10 * seq(1, 10, 4))))
     for (i in 1:ls@iter){
-        checkEquals(getBest(tuneres, res.ind=i), getBest(tuneres.native, res.ind=i))
+        checkEquals(getBestParameters(tuneres, res.ind=i), getBestParameters(tuneres.native, res.ind=i))
     }
     
     ##use tuneres in learnSurvival
     rm(svaggr, svaggr.native)
     set.seed(1)
-    svaggr <- learnSurvival(X=X,y=y,genesel=gsel,nbgene=100,survmethod='customSurv',customSurvModel=customSurvModel,learningsets=ls,tuneres=tuneres)
-    checkEquals(class(svaggr)[1], "survaggr")
+    svaggr <- learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=100,survmethod='customSurv',customSurvModel=customSurvModel,LearningSets=ls,tuneres=tuneres)
+    checkEquals(class(svaggr)[1], "LearnOut")
     ##natively
     set.seed(1)
-    svaggr.native <- learnSurvival(X=X,y=y,genesel=gsel,nbgene=100,survmethod='coxBoostSurv',learningsets=ls,tuneres=tuneres.native)
+    svaggr.native <- learnSurvival(X=X,y=y,GeneSel=gsel,nbgene=100,survmethod='coxBoostSurv',LearningSets=ls,tuneres=tuneres.native)
 
-    for (i in 1:length(svaggr@survoutputlist)){
+    for (i in 1:length(svaggr@ModelLearnedlist)){
         print(i)
-        mod <- svaggr@survoutputlist[[i]]@model@mod
-        mod.native <- svaggr.native@survoutputlist[[i]]@model@mod
+        mod <- svaggr@ModelLearnedlist[[i]]@model@mod
+        mod.native <- svaggr.native@ModelLearnedlist[[i]]@model@mod
         checkEquals(mod, mod.native)
     }
 

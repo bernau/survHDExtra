@@ -27,16 +27,16 @@ testPlusminusTuningFull <- function(){
             tuneargs$measure <- test.measure
             if(test.measure == "UnoC")
                 tuneargs$tau <- 10
-            getBest.args <- list()
+            getBestParameters.args <- list()
             ##tuning using whole dataset
-            getBest.args$tuneres <- do.call(tune, tuneargs)
+            getBestParameters.args$tuneres <- do.call(tune, tuneargs)
             ##prepare to evaluate
-            getBest.args$res.ind=1
-            getBest.args$measure <- test.measure
+            getBestParameters.args$res.ind=1
+            getBestParameters.args$measure <- test.measure
             if(test.measure == "UnoC")
-                getBest.args$tau <- 10
+                getBestParameters.args$tau <- 10
             ##optimum lambda
-            lambda.opt <- do.call(getBest, getBest.args)@par$lambda
+            lambda.opt <- do.call(getBestParameters, getBestParameters.args)@par$lambda
             ##check that the correct number of variables was selected
             checkEquals(lambda.opt, n.good.var)
         }

@@ -6,7 +6,7 @@
 # Date of creation: Apr 19, 2012
 # 
 # Brief description:
-#   Returns an object of class survoutput.
+#   Returns an object of class ModelLearned.
 # 
 # arguments: 
 #   -X: matrix of variables (rows are observations,columns are
@@ -16,7 +16,7 @@
 #              training the survival model
 # 
 # Value: 
-#    survoutput
+#    ModelLearned
 #
 ###############################################################################
 
@@ -75,7 +75,7 @@ setMethod("uniCoxSurv", signature(X = "data.frame", y = "Surv"), function(X, y, 
     ## Predictions on learning set can be used later for calculating baseline
     ## hazards
     linear.predictor <- predict(output2, newdata = Xlearn, type = "lp")
-    ret.obj <- new("survoutput", y = Ylearn, linear.predictor = linear.predictor, 
+    ret.obj <- new("ModelLearned", y = Ylearn, linear.predictor = linear.predictor, 
         learnind = learnind, method = "uniCoxSurv", model = output2)
     
     return(ret.obj)
@@ -103,10 +103,10 @@ setMethod("predictsurvhd", signature(object = "UniCoxSurv", newdata = "data.fram
             unicox.object <- object@mod
             pred <- predict.uniCox(unicox.object, x = newdata, ...)
             pred <- structure(pred[, 1], .Names = rownames(pred))
-            pred <- new("linpred", lp = pred)
+            pred <- new("LinearPrediction", lp = pred)
         }
         
-        if (type == "survprobs") {
+        if (type == "SurvivalProbs") {
             stop("Currently no uniCox-specific method for predicting survival probabilities implemented. Please try \"gbm=TRUE\".")
         }
         return(pred)

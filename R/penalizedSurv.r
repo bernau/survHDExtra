@@ -6,7 +6,7 @@
 # Date of creation: Jan 23, 2011
 #
 # Brief description:
-#   Returns an object of class survoutput.
+#   Returns an object of class ModelLearned.
 #
 # Arguments:
 #   -X: matrix of variables (rows are observations,columns are variables)
@@ -17,7 +17,7 @@
 #   -models: shall the model objects be returned
 #
 # Value:
-#   survoutput
+#   ModelLearned
 ###############################################################################
 
 
@@ -108,7 +108,7 @@ setMethod("penalizedSurv", signature(X = "data.frame", y = "Surv"), function(X, 
         linear.predictor <- predict(NULL, newdata = Xlearn)
     }
     
-    return( new("survoutput", y = Ylearn, linear.predictor = linear.predictor, 
+    return( new("ModelLearned", y = Ylearn, linear.predictor = linear.predictor, 
         learnind = learnind, method = "penalizedSurv", model = output2) )
 })
 
@@ -156,11 +156,11 @@ setMethod("predictsurvhd", signature(object = "PenalizedSurv", newdata = "data.f
                     stop("names of coefficients do not match colnames(newdata)")
                   pred <- (as.matrix(newdata) %*% cc) + intercept
                   pred <- structure(pred[, 1], .Names = rownames(pred))
-                  pred <- new("linpred", lp = pred)
+                  pred <- new("LinearPrediction", lp = pred)
                 }
             }
         }
-        if (type == "survprobs") {
+        if (type == "SurvivalProbs") {
             stop("Currently no Penalized-specific method for predicting survival probabilities implemented. Please try \"gbm=TRUE\".")
         }
         return(pred)

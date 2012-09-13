@@ -1,4 +1,4 @@
-setMethod("plot", signature(x = "genesel", y = "missing"), function(x, top = 10, 
+setMethod("plot", signature(x = "GeneSel", y = "missing"), function(x, top = 10, 
     iter = 1, ...) {
     imp <- x@importance
     R <- x@rankings
@@ -79,19 +79,19 @@ setMethod("plot", signature(x = "genesel", y = "missing"), function(x, top = 10,
     for(s in seq(along=spltchar)) points(x+(s-1)*deltax, y+deltay, pch=spltchar[s], cex=cex)
 }
 
-setMethod("plot", signature(x = "survoutput", y = "missing"), function(x, newdata, 
+setMethod("plot", signature(x = "ModelLearned", y = "missing"), function(x, newdata, 
     newy, method = "median", labels = NULL, ...) {
-    plotKMStratifyBy(method, y = newy, linearriskscore = predict(x, newdata = newdata, 
+    plotKMStratifyBy(method, y = newy, ModelLinear = predict(x, newdata = newdata, 
         type = "lp")@lp, labels = labels, ...)
 })
 
-setMethod("plot", signature(x = "ModelC", y = "missing"), function(x, newdata, 
+setMethod("plot", signature(x = "ModelBase", y = "missing"), function(x, newdata, 
     newy, method = "median", labels = NULL, ...) {
-    plotKMStratifyBy(method, y = newy, linearriskscore = predict(x, newdata = newdata, 
+    plotKMStratifyBy(method, y = newy, ModelLinear = predict(x, newdata = newdata, 
         type = "lp")@lp, labels = labels, ...)
 })
 
-setMethod("plot", signature(x = "survaggr", y = "missing"), function(x, method = "median", 
+setMethod("plot", signature(x = "LearnOut", y = "missing"), function(x, method = "median", 
     labels = NULL, ...) {
     # now use majority vote for each sample in X
     stratax <- as.factor(predict(x, type="cp", voting_scheme="first",

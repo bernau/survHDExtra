@@ -33,11 +33,11 @@
                   observations and predictions are made on the
                   learning set.}
   \item{unpenalizedvars}{matrix of unpenalized variables (same structure as \code{X})}
-  \item{essential}{shall the model output (see slot model of class \code{\link{survoutput}})
+  \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
                   include the bare essentials only (especially for tune this option might save a lot of memory)?}
   \item{\dots}{Further arguments that shall be passed to function \code{CoxBoost} (package: \code{CoxBoost}).}
 }
-\value{An object of class \code{\link{survoutput}}.}
+\value{An object of class \code{\link{ModelLearned}}.}
 \references{   Binder, H., et al. (2009) Boosting for high-dimensional time-to-event data with
 competing risks, Bioinformatics, 25 (7), 890-896
 }
@@ -57,7 +57,7 @@ time <- rexp(nsamples)
 cens <- sample(0:1,size=nsamples,replace=TRUE)
 y <- Surv(time,cens)
 
-survoutput<-coxBoostSurv(X=X,y=y,learnind=1:75)
+ModelLearned<-coxBoostSurv(X=X,y=y,learnind=1:75)
 }
 }
 \keyword{multivariate}

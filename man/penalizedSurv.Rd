@@ -35,7 +35,7 @@
     "elasticnet".}
   \item{unpenalizedvarnames}{Character vector which is a subset of
     colnames(X), naming variables which will be unpenalized.}
-    \item{essential}{shall the model output (see slot model of class \code{\link{survoutput}})
+    \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
                   include the bare essentials only (especially for tune this option might save a lot of memory)?}
   \item{\dots}{Further arguments that shall be passed to downstream
     functions.  Potential downstream functions include \code{optL1}, \code{optL2}, and
@@ -51,7 +51,7 @@
     
 }
 
-\value{An object of class \code{\link{survoutput}}.}
+\value{An object of class \code{\link{ModelLearned}}.}
 
 \references{
 Goeman, J.J. (2010) L1 Penalized Estimation in the Cox Proportional Hazards Model, Biometrical Journal, 52, 70-84
@@ -93,8 +93,8 @@ fit.penalized <- penalizedSurv(X=beerX,y=beerY, learnind=learnind, penalty="ridg
 predict(fit.penalized@model,newdata=beerX[testind,],type='lp')
 ##survival probabilities at each uncensored time
 mytimegrid <- sort(c(0.0,beerY[beerY[,2]==1,1]))
-survprobs <- predict(fit.penalized,beerX[testind,],type='survprobs',timegrid=mytimegrid,gbm=TRUE)@survprobs
-plot(survprobs,xlab="Time", ylab="Probability of Survival")
+SurvivalProbs <- predict(fit.penalized,beerX[testind,],type='SurvivalProbs',timegrid=mytimegrid,gbm=TRUE)@SurvivalProbs
+plot(SurvivalProbs,xlab="Time", ylab="Probability of Survival")
 }
 }
 }

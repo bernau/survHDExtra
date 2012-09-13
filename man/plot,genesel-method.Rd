@@ -1,16 +1,16 @@
 \name{Barplot}
-\alias{plot,genesel-method}
-\alias{plot,genesel,missing-method}
+\alias{plot,GeneSel-method}
+\alias{plot,GeneSel,missing-method}
 \title{Barplot of variable importance}
 \description{ The plot visualizes
              variable importance by a barplot. The height
              of the barplots correspond to variable importance.
              What variable importance exactly means depends
              on the method chosen when calling \code{\link{geneSelection}},
-             s. \code{\link{genesel}}.}
+             s. \code{\link{GeneSel}}.}
 
 \arguments{
-  \item{x}{An object of class \code{\link{genesel}}}
+  \item{x}{An object of class \code{\link{GeneSel}}}
   \item{top}{Number of top genes whose variable importance should be displayed.
              Defaults to 10.}
   \item{iter}{Iteration number (\code{learningset}) for which variable
@@ -40,5 +40,5 @@ Christoph Bernau \email{bernau@ibe.med.uni-muenchen.de}
 Martin Slawski \email{ms@cs.uni-sb.de}
 
         Anne-Laure Boulesteix \email{boulesteix@ibe.med.uni-muenchen.de}}
-\seealso{\code{\link{genesel}}, \code{\link{geneSelection}}}
+\seealso{\code{\link{GeneSel}}, \code{\link{geneSelection}}}
 \keyword{multivariate}

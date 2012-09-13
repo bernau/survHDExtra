@@ -6,7 +6,7 @@
 # Date of creation: May 7, 2012
 # 
 # Brief description:
-#   Returns an object of class survoutput.
+#   Returns an object of class ModelLearned.
 # 
 ###############################################################################
 
@@ -60,7 +60,7 @@ setMethod("superPcSurv", signature(X = "data.frame", y = "Surv"), function(X, y,
     
     ll$newdata = ll$data
     linear.predictor <- do.call("superpc.predict", args = ll[names(ll) %in% good.arg.names.predict])$v.pred.1df
-    linear.predictor <- new("linpred", lp = linear.predictor)
+    linear.predictor <- new("LinearPrediction", lp = linear.predictor)
     ll$newdata <- NULL
     
     
@@ -71,7 +71,7 @@ setMethod("superPcSurv", signature(X = "data.frame", y = "Surv"), function(X, y,
         # prune model.out
     }
     
-    return( new("survoutput", y = Ylearn, linear.predictor = linear.predictor, 
+    return( new("ModelLearned", y = Ylearn, linear.predictor = linear.predictor, 
         learnind = learnind, method = "superPcSurv", model = model.out) )
 })
 
@@ -96,8 +96,8 @@ setMethod("predictsurvhd", signature(object = "SuperPcSurv", newdata = "data.fra
             ll$newdata = list(x = t(newdata))
             ll = c(ll, object@mod)
             pred <- do.call("superpc.predict", args = ll)$v.pred.1df
-            pred <- new("linpred", lp = pred)
-        } else if (type == "survprobs") {
+            pred <- new("LinearPrediction", lp = pred)
+        } else if (type == "SurvivalProbs") {
             stop("Currently no SuperPC-specific method for predicting survival probabilities implemented. Please try \"gbm=TRUE\".")
         }
         

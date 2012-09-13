@@ -1,10 +1,10 @@
-\name{Kaplan-Meier plot (survaggr)}
-\alias{plot,survaggr,missing-method}
-\title{Kaplan-Meier plot for survaggr-objects}
-\description{The plot visualizes a Kaplan-Meier plot from a survaggr
+\name{Kaplan-Meier plot (LearnOut)}
+\alias{plot,LearnOut,missing-method}
+\title{Kaplan-Meier plot for LearnOut-objects}
+\description{The plot visualizes a Kaplan-Meier plot from a LearnOut
 object}
 \arguments{
-  \item{x}{An object of class \code{\link{survaggr}}}
+  \item{x}{An object of class \code{\link{LearnOut}}}
   \item{method}{A method for patient stratification supported by
   \code{\link{plotKMStratifyBy}}. Default "median". Ignored if
   \code{\link{plotKMStratifyBy}} argument \code{cutpoints} is not
@@ -27,7 +27,7 @@ y<-Surv(beer.survival[,2],beer.survival[,1])
 
 ls<-generateLearningsets(y=y[,1],method='CV',fold=3,niter=1)
 
-svaggr<-learnSurvival(X=X,y=y,survmethod='coxBoostSurv',learningsets=ls)
+svaggr<-learnSurvival(X=X,y=y,survmethod='coxBoostSurv',LearningSets=ls)
 plot(svaggr)
 }
 }

@@ -20,10 +20,10 @@ test_penalizedSurv_tunewitherr <- function(){
     set.seed(1)
     ll <- makeSampledat(100, 50)
     #tuneres.witherr <- do.call(tune, args=ll)
-    #lambda.witherr <- getBest(tuneres.witherr, res.ind=1, measure='CvPLogL')@par$lambda
+    #lambda.witherr <- getBestParameters(tuneres.witherr, res.ind=1, measure='CvPLogL')@par$lambda
     #ll$grids$lambda <- ll$grids$lambda[-1]
     #tuneres.fine <- do.call(tune, args=ll)
-    #lambda.fine <- getBest(tuneres.fine, res.ind=1, measure='CvPLogL')@par$lambda
+    #lambda.fine <- getBestParameters(tuneres.fine, res.ind=1, measure='CvPLogL')@par$lambda
     #checkEquals(lambda.witherr, lambda.fine)
 	
 	###model does not converge-> problem happens in predictsurvhd(sig(penalizedSurv,))

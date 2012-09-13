@@ -7,7 +7,7 @@ Kaplan-Meier plot
  A simple but feature-complete Kaplan-Meier plot with sane defaults.
 }
 \usage{
-plotKMStratifyBy(method = "median", y, linearriskscore, cutpoints=NULL, labels
+plotKMStratifyBy(method = "median", y, ModelLinear, cutpoints=NULL, labels
 = NULL, plot = TRUE, ...)
 }
 \arguments{
@@ -20,7 +20,7 @@ plotKMStratifyBy(method = "median", y, linearriskscore, cutpoints=NULL, labels
   \item{y}{
   Surv object with the survival times for each patient.
 }
-  \item{linearriskscore}{
+  \item{ModelLinear}{
   Vector of linear risk scores for each patient.
 }
   \item{cutpoints}{
@@ -54,9 +54,9 @@ patients based on a linear risk score.
 \dontrun{
 require(survHD)
 # stratify patients by median of a linear risk score
-plotKMStratifyBy("median",y=Surv(bladder$stop, bladder$event),linearriskscore=1/bladder$enum)
+plotKMStratifyBy("median",y=Surv(bladder$stop, bladder$event),ModelLinear=1/bladder$enum)
 # find optimal cutoffs with the maxstat package, using the Lau92 method
-plotKMStratifyBy("Lau92",y=Surv(bladder$stop, bladder$event),linearriskscore=1/bladder$enum)
+plotKMStratifyBy("Lau92",y=Surv(bladder$stop, bladder$event),ModelLinear=1/bladder$enum)
 }
 }
 

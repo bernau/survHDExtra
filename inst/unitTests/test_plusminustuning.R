@@ -14,14 +14,14 @@ testPlusminusTuning <- function(){
     X <- as.matrix(simdat$data[,-match(c("time","cens"),colnames(simdat$data))])
     y <- Surv(simdat$data$time,simdat$data$cens)
     bootds <- generateLearningsets(y = y, method = "CV", fold = 8, niter = 1, strat = FALSE)
-    tuneres <- tune(X = X, y = y, learningsets = bootds,
+    tuneres <- tune(X = X, y = y, LearningSets = bootds,
                     survmethod="plusMinusSurv", 
                     grids = list(lambda = c(1, 10, 50)),
                     option="fast")                
 
-    lambda.CvPLogL.1 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='CvPLogL')@par$lambda))
-    lambda.HarrellC.1 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='HarrellC')@par$lambda))
-    lambda.UnoC.1 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda))
+    lambda.CvPLogL.1 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='CvPLogL')@par$lambda))
+    lambda.HarrellC.1 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='HarrellC')@par$lambda))
+    lambda.UnoC.1 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda))
 
     ##if these pass, the correct value of the tuning parameter was selected in every fold:
     checkEquals(lambda.CvPLogL.1, 1)
@@ -41,15 +41,15 @@ testPlusminusTuning <- function(){
     X <- as.matrix(simdat$data[,-match(c("time","cens"),colnames(simdat$data))])
     y <- Surv(simdat$data$time,simdat$data$cens)
     bootds <- generateLearningsets(y = y, method = "CV", fold = 8, niter = 1, strat = FALSE)
-    tuneres <- tune(X = X, y = y, learningsets = bootds,
+    tuneres <- tune(X = X, y = y, LearningSets = bootds,
                     survmethod="plusMinusSurv", 
                     grids = list(lambda = c(1, 10, 50)),
                     option="fast")
 
 
-    (lambda.CvPLogL.10 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='CvPLogL')@par$lambda)))
-    (lambda.HarrellC.10 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='HarrellC')@par$lambda)))
-    (lambda.UnoC.10 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda)))
+    (lambda.CvPLogL.10 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='CvPLogL')@par$lambda)))
+    (lambda.HarrellC.10 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='HarrellC')@par$lambda)))
+    (lambda.UnoC.10 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda)))
 
     ##if these pass, the correct value of the tuning parameter was selected in every fold:
     checkEquals(lambda.CvPLogL.10, 10)
@@ -68,15 +68,15 @@ testPlusminusTuning <- function(){
     X <- as.matrix(simdat$data[,-match(c("time","cens"),colnames(simdat$data))])
     y <- Surv(simdat$data$time,simdat$data$cens)
     bootds <- generateLearningsets(y = y, method = "CV", fold = 8, niter = 1, strat = FALSE)
-    tuneres <- tune(X = X, y = y, learningsets = bootds,
+    tuneres <- tune(X = X, y = y, LearningSets = bootds,
                     survmethod="plusMinusSurv", 
                     grids = list(lambda = c(1, 10, 50)),
                     option="fast")
 
 
-    (lambda.CvPLogL.50 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='CvPLogL')@par$lambda)))
-    (lambda.HarrellC.50 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='HarrellC')@par$lambda)))
-    (lambda.UnoC.50 <- unique(sapply(1:8, function(i) getBest(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda)))
+    (lambda.CvPLogL.50 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='CvPLogL')@par$lambda)))
+    (lambda.HarrellC.50 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='HarrellC')@par$lambda)))
+    (lambda.UnoC.50 <- unique(sapply(1:8, function(i) getBestParameters(tuneres,res.ind=i,measure='UnoC', tau=10)@par$lambda)))
 
     ##if these pass, the correct value of the tuning parameter was
     ##selected in every fold.  note that tuning does not seem to work

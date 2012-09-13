@@ -32,14 +32,14 @@
                   in that case, the learning set consists of all
                   observations and predictions are made on the
                   learning set.}
-                  \item{essential}{shall the model output (see slot model of class \code{\link{survoutput}})
+                  \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
                   include the bare essentials only (especially for tune this option might save a lot of memory)?}
   \item{\dots}{Further arguments that shall be passed to \code{uniCox}
     function from the uniCox R package (http://cran.r-project.org/web/packages/uniCox/index.html)
   }
   }
 
-\value{An object of class \code{\link{survoutput}}.}
+\value{An object of class \code{\link{ModelLearned}}.}
 
 \references{Tibshirani RJ: Univariate shrinkage in the cox model for high
   dimensional data. \emph{Stat Appl Genet Mol Biol 2009, 8:Article21.}}
@@ -76,8 +76,8 @@ fit.unicox <- uniCoxSurv(X=beerX,y=beerY, learnind=learnind, lambda=10)
 predict(fit.unicox@model,newdata=beerX[testind,],type='lp')
 ##survival probabilities at each uncensored time
 mytimegrid <- sort(c(0.0,beerY[beerY[,2]==1,1]))
-survprobs <- predict(fit.unicox,beerX[testind,],type='survprobs',timegrid=mytimegrid,gbm=TRUE)@survprobs
-plot(survprobs,xlab="Time", ylab="Probability of Survival")
+SurvivalProbs <- predict(fit.unicox,beerX[testind,],type='SurvivalProbs',timegrid=mytimegrid,gbm=TRUE)@SurvivalProbs
+plot(SurvivalProbs,xlab="Time", ylab="Probability of Survival")
 }
 }
 }

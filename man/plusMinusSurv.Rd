@@ -35,7 +35,7 @@
                   in that case, the learning set consists of all
                   observations and predictions are made on the
                   learning set.}
-                  \item{essential}{shall the model output (see slot model of class \code{\link{survoutput}})
+                  \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
                   include the bare essentials only (especially for tune
 		  this option might save a lot of memory)?}
 		\item{modeltype}{Can be "plusminus",
@@ -46,7 +46,7 @@
 
 }
 
-\value{An object of class \code{\link{survoutput}}.}
+\value{An object of class \code{\link{ModelLearned}}.}
 
 \author{
   Levi Waldron \email{lwaldron@hsph.harvard.edu}
@@ -80,8 +80,8 @@ fit.plusminus <- plusMinusSurv(X=beerX,y=beerY, learnind=learnind, lambda=10)
 predict(fit.plusminus@model,newdata=beerX[testind,],type='lp')
 ##survival probabilities at each uncensored time
 mytimegrid <- sort(c(0.0,beerY[beerY[,2]==1,1]))
-survprobs <- predict(fit.plusminus,beerX[testind,],type='survprobs',timegrid=mytimegrid,gbm=TRUE)@survprobs
-plot(survprobs,xlab="Time", ylab="Probability of Survival")
+SurvivalProbs <- predict(fit.plusminus,beerX[testind,],type='SurvivalProbs',timegrid=mytimegrid,gbm=TRUE)@SurvivalProbs
+plot(SurvivalProbs,xlab="Time", ylab="Probability of Survival")
 }
 }
 }

@@ -1,14 +1,14 @@
-\name{Kaplan-Meier plot (survoutput)}
-\alias{plot,survoutput-method}
-\alias{plot,survoutput,missing-method}
-\alias{plot,ModelC,missing-method}
+\name{Kaplan-Meier plot (ModelLearned)}
+\alias{plot,ModelLearned-method}
+\alias{plot,ModelLearned,missing-method}
+\alias{plot,ModelBase,missing-method}
 \title{Kaplan-Meier plot}
-\description{ The plot visualizes a Kaplan-Meier plot from a survoutput
-or linearriskscore object}
+\description{ The plot visualizes a Kaplan-Meier plot from a ModelLearned
+or ModelLinear object}
 
 \arguments{
-  \item{x}{An object of class \code{\link{survoutput}} or
-  \code{\link{linearriskscore}}.}
+  \item{x}{An object of class \code{\link{ModelLearned}} or
+  \code{\link{ModelLinear}}.}
   \item{newdata}{gene expressions for the test data}
   \item{newy}{survival response for the test data}
   \item{method}{A method for patient stratification supported by
@@ -35,8 +35,8 @@ library(survHD)
 	
 	ls<-generateLearningsets(y=y[,1],method='CV',fold=3,niter=1)
 	
-	svaggr<-learnSurvival(X=X,y=y,survmethod='coxBoostSurv',learningsets=ls)
-	plot(svaggr@survoutputlist[[2]],newdata=svaggr@X[svaggr@survoutputlist[[2]]@learnind,],newy=svaggr@survoutputlist[[2]]@y)
+	svaggr<-learnSurvival(X=X,y=y,survmethod='coxBoostSurv',LearningSets=ls)
+	plot(svaggr@ModelLearnedlist[[2]],newdata=svaggr@X[svaggr@ModelLearnedlist[[2]]@learnind,],newy=svaggr@ModelLearnedlist[[2]]@y)
 
 }
 }

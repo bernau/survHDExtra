@@ -37,14 +37,14 @@
                   in that case, the learning set consists of all
                   observations and predictions are made on the
                   learning set.}
-                  \item{essential}{shall the model output (see slot model of class \code{\link{survoutput}})
+                  \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
                   include the bare essentials only (especially for tune this option might save a lot of memory)?}
   \item{\dots}{Further arguments that shall be passed to \code{superpc.train}
     function from the superpc R package (http://cran.r-project.org/web/packages/superpc/index.html)
   }
   }
 
-\value{An object of class \code{\link{survoutput}}.}
+\value{An object of class \code{\link{ModelLearned}}.}
 
 \references{Bair E, Tibshirani R: Semi-Supervised Methods to Predict Patient Survival from Gene Expression Data. \emph{PLoS Biology 2004, 2:e108.}}
 
@@ -70,7 +70,7 @@ require(survival)
 	cens <- sample(0:1,size=nsamples,replace=TRUE)
 	y <- Surv(time,cens)
 
-survoutput<-superPcSurv(X=X,y=y,learnind=1:75)	
+ModelLearned<-superPcSurv(X=X,y=y,learnind=1:75)	
 
 }
 }
