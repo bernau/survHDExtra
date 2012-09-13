@@ -1,8 +1,8 @@
 
-%\VignetteIndexEntry{CMA Manual}
-%\VignetteKeywords{Classification}
-%\VignetteDepends{survHD}
-%\VignettePackage{survHD}
+%\VignetteIndexEntry{survHDExtra Manual}
+%\VignetteKeywords{Survival Analysis}
+%\VignetteDepends{survHDExtra,survHD}
+%\VignettePackage{survHDExtra}
 
 \input{preamble.tex}
 \title{\Huge{{\bf survHDExtra}}\\ package vignette}
@@ -23,7 +23,7 @@ options(width=60)
 @ 
 
 
-\section{SurvHD - Survival Analysis for High-Dimensional Data (Gene Expression Data)}
+\section{SurvHDExtra--Additonal features for survHD }
 
 Survival analysis on high-dimensional data is a complex and
 computationally intensive task. Many standard algorithms for survival

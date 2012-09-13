@@ -11,10 +11,7 @@ Suggests: MASS, snow, CoxBoost, randomSurvivalForest,
 	uniCox,gbm, superpc, pensim, RUnit, genefilter, limma,
     RColorBrewer, maxstat, survcomp, lattice, hu6800.db,
     annotate, graphite, survIDINRI
-Description: This package provides a comprehensive collection of various microarray-based survival algorithms
-             both from Machine Learning and Statistics.
-             Variable Selection, Hyperparameter tuning, Evaluation and Comparison can be performed
-             combined or stepwise in a user-friendly environment.
+Description: This package provides additional features.
 Collate: plot-methods.r coxBoostSurv.r plusminuscore.r plusMinusSurv.r 
         superPcSurv.r penalizedSurv.r uniCoxSurv.r AllClasses.r AllGenerics.r
         plotKM.r plotKMStratifyBy.r gsa.r 
