@@ -16,11 +16,11 @@ test_all <- function() {
     tests <- list(X = list(X, data.frame(X), ExpressionSet(t(X)), ExpressionSet(t(X), 
         phenoData = as(dfy, "AnnotatedDataFrame"))), y = list(y, y, y, "y"))
     
-    learningsets <- generateLearningsets(y = y, method = "CV", fold = 5, niter = 1, 
+    LearningSets <- generateLearningsets(y = y, method = "CV", fold = 5, niter = 1, 
         strat = TRUE)
     
     res.survhd <- lapply(1:length(tests$X), function(i) learnSurvival(X = tests$X[[i]], 
-        y = tests$y[[i]], learningsets = learningsets, survmethod = "penalizedSurv", 
+        y = tests$y[[i]], LearningSets = LearningSets, survmethod = "penalizedSurv", 
         penalty = "ridge", lambda = 1000))
     
     sapply(1:3, function(i) checkEquals(res.survhd[[i]], res.survhd[[i + 1]]))
