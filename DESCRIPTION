@@ -14,7 +14,7 @@ Suggests: MASS, snow, CoxBoost, randomSurvivalForest,
 Description: This package provides additional features.
 Collate: plot-methods.r coxBoostSurv.r plusminuscore.r plusMinusSurv.r 
         superPcSurv.r penalizedSurv.r uniCoxSurv.r AllClasses.r AllGenerics.r
-        plotKM.r plotKMStratifyBy.r gsa.r 
+        plotKM.r plotKMStratifyBy.r gsa.r customPenalized.r
 License: GPL (>= 2)
 biocViews: Survival
 Packaged: 2011-11-01 05:21:58 UTC; biocbuild
