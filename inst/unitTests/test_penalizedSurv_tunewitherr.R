@@ -7,7 +7,8 @@ makeSampledat <- function(features, samples){
     ll$strat <- FALSE
     ll$measure <- "CvPLogL"
     ll$grids$lambda <- c(1, 10, 100)
-    ll$survmethod <- "penalizedSurv"
+    ll$survmethod <- "customSurv"
+    ll$customSurvModel<-customPenalized
     ll$penalty <- "ridge"
     ll$standardize <- FALSE
     return(ll)
@@ -17,6 +18,7 @@ makeSampledat <- function(features, samples){
 test_penalizedSurv_tunewitherr <- function(){
     require(penalized)
     require(survHD)
+	require(survHDExtra)
     set.seed(1)
     ll <- makeSampledat(100, 50)
     #tuneres.witherr <- do.call(tune, args=ll)

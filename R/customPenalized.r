@@ -42,7 +42,7 @@ customPenalized<-function(Xlearn,Ylearn,learnind,...){
 		} else if (identical(ll$penalty, "elasticnet")) {
 			good.arg.names <- names(formals(opt2D))
 			opt2D.output <- do.call(opt2D, args = ll[names(ll) %in% good.arg.names])
-			ll$lambda <- opt2D.output[which.max(optD.output[, "cvl"]), c("L1", "L2")]
+			ll$lambda <- opt2D.output[which.max(opt2D.output[, "cvl"]), c("L1", "L2")]
 		} else {
 			stop("Unknown penalty. Must be either ridge, lasso, or elasticnet.")
 		}
@@ -50,7 +50,7 @@ customPenalized<-function(Xlearn,Ylearn,learnind,...){
 	
 	if (identical(ll$penalty, "ridge")) {
 		names(ll)[names(ll) == "lambda"] <- "lambda2"  ##correct naming of tuning parameter
-	} else if (identical(penalty, "lasso")) {
+	} else if (identical(ll$penalty, "lasso")) {
 		names(ll)[names(ll) == "lambda"] <- "lambda1"  ##correct naming of tuning parameter
 	} else if (identical(penalty, "elasticnet")) {
 		ll$lambda1 <- ll$lambda[1]
@@ -62,6 +62,9 @@ customPenalized<-function(Xlearn,Ylearn,learnind,...){
 	good.arg.names <- names(formals(penalized))
 	output <- try(do.call("penalized", args = ll[names(ll) %in% good.arg.names]), 
 			silent = TRUE)
+
+#output <- do.call("penalized", args = ll[names(ll) %in% good.arg.names])
+		
 	## browser(expr=eval(expression(class(output) == 'try-error'))) Predictions on
 	## learning set can be used later for calculating baseline hazards
 	

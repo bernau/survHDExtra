@@ -1,5 +1,7 @@
 \name{penalizedSurv}
 \alias{penalizedSurv}
+\alias{customPenalized}
+\alias{customRSF}
 \alias{penalizedSurv,ExpressionSet,character-method}
 \alias{penalizedSurv,ExpressionSet,Surv-method}
 \alias{penalizedSurv,data.frame,Surv-method}

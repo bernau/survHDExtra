@@ -12,8 +12,8 @@ importMethodsFrom(penalized, "[", "[[", as.data.frame, as.list, as.matrix,
 
 exportClasses("gsagenesets", "gsaresults")
 
-exportMethods("plot", "coxBoostSurv",
-              "penalizedSurv", "uniCoxSurv", "plusMinusSurv", "superPcSurv",
+exportMethods("plot", 
+              "penalizedSurv", "uniCoxSurv", "superPcSurv",
               "gsaWilcoxSurv", "gsaTranslateGmt")
 
-export(plusMinus, plotKM, plotKMStratifyBy, gsaReadGmt, gsaPathwayGmt)
+export(plotKM, plotKMStratifyBy, gsaReadGmt, gsaPathwayGmt,customPenalized,customRSF)
