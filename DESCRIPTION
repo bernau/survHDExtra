@@ -12,9 +12,9 @@ Suggests: MASS, snow, CoxBoost, randomSurvivalForest,
     RColorBrewer, maxstat, survcomp, lattice, hu6800.db,
     annotate, graphite, survIDINRI
 Description: This package provides additional features.
-Collate: plot-methods.r customRSF.r
-        superPcSurv.r penalizedSurv.r uniCoxSurv.r AllClasses.r AllGenerics.r
-        plotKM.r plotKMStratifyBy.r gsa.r customPenalized.r
+Collate: plot-methods.r customRSF.r customUniCox.r customSuperPc.r
+        AllClasses.r AllGenerics.r
+        gsa.r customPenalized.r
 License: GPL (>= 2)
 biocViews: Survival
 Packaged: 2011-11-01 05:21:58 UTC; biocbuild

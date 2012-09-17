@@ -50,8 +50,8 @@ X, y, genenames, statistics, ...)
 }
 \examples{
     library(survHD)
+     library(survHDExtra)
     set.seed(100)
-
     # create some random data
     x<-matrix(rnorm(1000*20),ncol=20)
     dd<-sample(1:1000,size=100)

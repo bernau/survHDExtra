@@ -25,23 +25,462 @@ options(width=60)
 
 \section{SurvHDExtra--Additonal features for survHD }
 
-Survival analysis on high-dimensional data is a complex and
-computationally intensive task. Many standard algorithms for survival
-data are not applicable in the "$p>>n$"-case, e.g. with several
-thousands of variables and only hundreds of samples.  Many adaptions
-of the Cox-Model and other standard approaches for high-dimensional
-data have been developed in the last years.  Furthermore, methods for
-tuning and evaluation of models are distinct from classification
-problems.  Our R-package {\bf survHD} provides a framework for the
-application, optimization, and evaluation of high-dimensional survival
-models.  In this vignette, we will introduce the basic work flow of
-the package using a well-known cancer microarray data
-set. Additionally, we will explain the built-in interface for
-including user-defined custom survival model functions into the {\bf
-  survHD} framework.
+This package provides additional features for the Bioconductor package {\bf
+survHD} which is meant for survival analysis on highdimensional data.
+The most important features currently implemented are additional survival
+methods (e.g. {\bf customPenalized}, {customUniCox}, {customSuperPc} or {\bf
+customRSF})which can be included into the {\bf survHD} framework via the 
+{\bf customSurv} interface. Moreover, {\bf survHDExtra} provides several helpful
+methods for geneset analysis which are also introduced here.
+
+
+\section{Custom Survival Models}
+
+
+
+<<customfun, eval=T, echo=F, results=hide>>=
+###random survival forest as a custom survival model function
+##Xlearn and Ylearn are obligatory inputs 
+customRSF <- function(Xlearn, Ylearn, learnind, ...){
+		###load required packages
+		require(randomSurvivalForest)
+		###handle inputs
+		
+		ll <- list(...)
+		datarsf <- data.frame(Xlearn, time=Ylearn[, 1], status=Ylearn[, 2])
+		ll$data <- datarsf
+		ll$formula <- as.formula('Surv(time, status)~.')
+		
+		##call actual model function rsf from randomSurvivalForest
+		output.rsf <- do.call("rsf",  args = ll)
+		
+		##define prediction function which will be stored in slot predfun
+		##and called by predictsurvhd (signature(ModelCustom))
+		###
+		predfun <- function(object, newdata, type, timegrid=NULL, ...){
+			require(randomSurvivalForest)
+#either type lp or type SurvivalProbs must be implemented
+#for typ lp the obligatory return class is LinearPrediction
+			if (type == "lp") {
+				stop("Random Forests don't provide linear predictors,  sorry.")
+			}
+#for typ SurvivalProbs the obligatory return class is Breslow
+			else if (type == "SurvivalProbs") {
+				modelobj <- object@mod
+				if (is.null(timegrid)) {
+					stop("No timegrid specified.")
+				}
+				
+				###create data for which predictions are to be performed
+				###function checks for response but does not use it (fake response)
+				predsrsf <- predict.rsf(object = modelobj,  test=data.frame(newdata, time=rexp(n=nrow(newdata)), status=sample(c(0, 1), nrow(newdata), replace=T)))
+				###predict-function provides predictions for training times only
+				###->interpolate for timepoints in timegrid
+				curves <- exp(-t(apply(predsrsf$ensemble, 1, FUN=function(z) approx(x=predsrsf$timeInterest, y=z, xout=timegrid)$y)))
+				###create breslow-object
+				pred <- new("breslow",  curves = curves,  time = timegrid)
+				###create SurvivalProbs-object embedding the breslow-object
+				pred <- new("SurvivalProbs",  SurvivalProbs = pred)
+			}
+			
+			else stop('Invalid "type" argument.')
+			return(pred)  
+		}
+		
+		
+		###now create customsurvhd-object (which is the obligatory output-object)
+		custommod <- new("ModelCustom", mod=output.rsf, predfun=predfun, extraData=list())
+		
+		return(custommod)
+	}
+	
+@ 
+
+The {\bf survHD} package provides an interface for incorporating user defined survival methods into its framework. 
+As mentioned above, several of such 'custom survival functiaons' are implemented
+in this package. If necessary, however, you can also include your own
+user-defined survival mathods (you also might consider sending us your
+function or posting it on github for inclusion into {\bf survHDExtra}).
+For that purpose, two functionalities are needed:
+
+\begin{itemize}
+\item model fitting 
+\item prediction from previously fitted models
+\end{itemize}
+
+
+Both features are implemented by defining a single function. In our example we ill add the method {\bf rsf} from the package {\bf randomSurvivalForest} to {\bf survHD} as a custom function {\bf customRSF}. The user-defined function has to accept at least three predefined inputs:
+\begin{itemize}
+  \item {\bf Xlearn:} A {\bf data.frame} of gene expressions for the current training data(columns are genes) \item {\bf Ylearn:} the survival response for the current training data
+    \item {\bf learnind}: the indices of the current training observations inside the complete data set {\bf X} which is usually passed to functions like {\bf learnSurvival}. Using this argument,  one can e.g. extract the relevant observations from additional clinical covariates which can be passed using the {\dots} argument.
+  \end{itemize}
+
+\begin{Schunk}
+\begin{Sinput}
+customRSF <- function(Xlearn, Ylearn, learnind, ...){
+		###load required packages
+		require(randomSurvivalForest)
+		###handle inputs
+		ll <- list(...)
+		datarsf <- data.frame(Xlearn, time=Ylearn[, 1], status=Ylearn[, 2])
+		ll$data <- datarsf
+		ll$formula <- as.formula('Surv(time, status)~.')
+		
+		##call actual model function rsf from randomSurvivalForest
+		output.rsf <- do.call("rsf",  args = ll)
+                ...}
+\end{Sinput}
+\end{Schunk}
+
+
+First,  one typically has to load or source a function or package which performs the actual model fitting. The next step is the processing of the inputs. In our case we do not use any additional covariates,  so we only have to convert {\bf Xlearn} and {\bf Ylearn} into the input format of the function {\bf rsf}. As can be seen from the code,  this function accepts a {\bf formula} and a {\bf data.frame} containing all necessary variables. Moreover,  we pass all the arguments represented by {\bf \dots} argument and eventually call the function {\bf rsf} using {\bf do.call}. After this the model fitting is complete.
+
+In order to provide outputs which can be evaluated and processed by {\bf survHD}
+ we also need a {\bf predict} function. This function should either provide an object of class {\bf LinearPrediction} or {\bf SurvivalProbs} whose slots can be found below:
+ 
+ 
+\begin{Schunk}
+\begin{Sinput}
+>  LinearPrediction <- predict(coxboostmodel, newdata=Xtest, type='lp')[[1]]
+>  str(LinearPrediction, max.level=2)
+\end{Sinput}
+\begin{Soutput}
+Formal class 'LinearPrediction' [package "survHD"] with 1 slots
+  ..@ lp: Named num [1:26] 1.952 -0.1976 -0.0529 -0.1154 -0.5334 ...
+  .. ..- attr(*,  "names")= chr [1:26] "L59" "L61" "L62" "L64" ...
+\end{Soutput}
+\begin{Sinput}
+>  SurvivalProbs <- predict(coxboostmodel, newdata=Xtest, type='SurvivalProbs', 
++  timegrid=3:80)[[1]]
+>  str(SurvivalProbs, max.level=2)
+\end{Sinput}
+\end{Schunk}
+ 
+
+ The prediction function has to accept four arguments:
+ 
+ \begin{itemize}
+ \item {\bf object:} an object of class {\bf ModelCustom} which contain is created by the {\bf survHD} automatically and contains the fitted model (here: {\bf output.rsf}) in its slot {\bf mod}.
+ \item {\bf newdata:} {\bf data.frame} of geneexpressions for the observations for which predictions shall be performed. 
+ \item {\bf type:} indicates whether linear predictors ({\bf 'lp'} or survival probabilities ({\bf 'SurvivalProbs'}) shall be predicted
+   \item {\bf timegrid:} if {\bf type='SurvivalProbs'} this argument specifies the time points at which predictions shall be performed
+ \end{itemize}
+ 
+\begin{Schunk}
+  \begin{Sinput}
+##define prediction function which will be stored in slot predfun
+##and called by predictsurvhd (signature(ModelCustom))
+###
+predfun <- function(object, newdata, type, timegrid=NULL, ...){
+require(randomSurvivalForest)
+#either type lp or type SurvivalProbs must be implemented
+#for typ lp the obligatory return class is LinearPrediction
+        if (type == "lp") {
+       stop("Random Forests don't provide linear predictors,  sorry.")
+        }
+#for typ SurvivalProbs the obligatory return class is Breslow
+        else if (type == "SurvivalProbs") {
+            modelobj <- object@mod
+            if (is.null(timegrid)) {
+                stop("No timegrid specified.")
+            }
+
+###create data for which predictions are to be performed
+###function checks for response but does not use it (fake response)
+predsrsf <- predict.rsf(object = modelobj,  test=data.frame(newdata, 
+time=rexp(n=nrow(newdata)), status=sample(c(0, 1), nrow(newdata), replace=T)))
+###predict-function provides predictions for training times only
+###->interpolate for timepoints in timegrid
+curves <- exp(-t(apply(predsrsf$ensemble, 1, FUN=function(z) 
+approx(x=predsrsf$timeInterest, y=z, xout=timegrid)$y)))
+###create breslow-object
+pred <- new("breslow",  curves = curves,  time = timegrid)
+###create SurvivalProbs-object embedding the breslow-object
+            pred <- new("SurvivalProbs",  SurvivalProbs = pred)
+        }
+else stop('Invalid "type" argument.')
+return(pred)  
+}
+
+
+\end{Sinput}
+\end{Schunk}
+
+This function is structured into two sections which correspond to predicting linear predictors and survival probabilities respectively. Since random survival forests are not capable of providing linear predictors the first section simply returns an error. In the survival probability section at first the input data have to be preprocessed for the function {\bf predict.rsf} which can perform predictions on the basis of objects of class {\bf randomSurvivalForest} created by the function {\bf rsf}. Subsequently,  this predictions are estimated and eventually an object of class {\bf SurvivalProbs} is created which is the predefined class for survival probabilities in {\bf survHD}.
+Its only slot {\bf SurvivalProbs} is an object of class {\bf Breslow} which not only stores the survival probabilities in the slot {\bf curves} but also the time points in slot {\bf time}. This {\bf survprob} object is finally returned by the custom prediction function.
+
+The definition of this prediction function was the second part of the user-defined survival function {\bf customRSF}. In the end,  we still have to create the obligatory output object of class 
+{\bf ModelCustom} which primarily consist of the fitted model object {\bf output.rsf} in slot {\bf mod} and the user-defined prediction function in slot {\bf predfun}. Additional information can be stored in the slot {\bf extraData} which must be of class {\bf list}:
+
+\begin{Schunk}
+ \begin{Sinput}
+  ###now create customsurvhd-object (which is the obligatory output-object)
+custommod <- new("ModelCustom", mod=output.rsf, predfun=predfun, extraData=list())
+		
+ return(custommod)
+ \end{Sinput}
+ \end{Schunk}
+ 
+ Just for the sake of completeness,  the complete user defined survival method looks like this.
+ It basically consists of three parts: model fitting,  prediction function,  creating of the {\bf customsurvhd} object:
+ 
+ \begin{Schunk}
+ \begin{Sinput}
+  
+ ###random survival forest as a custom survival model function
+##Xlearn and Ylearn are obligatory inputs 
+customRSF <- function(Xlearn, Ylearn, learnind, ...){
+  ###load required packages
+  require(randomSurvivalForest)
+  ###handle inputs
+		
+  ll <- list(...)
+  datarsf <- data.frame(Xlearn, time=Ylearn[, 1], status=Ylearn[, 2])
+  ll$data <- datarsf
+  ll$formula <- as.formula('Surv(time, status)~.')
+		
+  ##call actual model function rsf from randomSurvivalForest
+  output.rsf <- do.call("rsf",  args = ll)
+		
+  ##define prediction function which will be stored in slot predfun
+  ##and called by predictsurvhd (signature(ModelCustom))
+  predfun <- function(object, newdata, type, timegrid=NULL, ...){
+  require(randomSurvivalForest)
+  #either type lp or type SurvivalProbs must be implemented
+  #for typ lp the obligatory return class is LinearPrediction
+	if (type == "lp") {
+	stop("Random Forests don't provide linear predictors,  sorry.")
+	}
+  #for typ SurvivalProbs the obligatory return class is Breslow
+  else if (type == "SurvivalProbs") {
+  modelobj <- object@mod
+  if (is.null(timegrid)) {
+    stop("No timegrid specified.")
+	}
+				
+        ###create data for which predictions are to be performed
+	###function checks for response but does not use it (fake response)
+	predsrsf <- predict.rsf(object = modelobj,  test=data.frame(newdata, 
+        time=rexp(n=nrow(newdata)), status=sample(c(0, 1), nrow(newdata), replace=T)))
+	###predict-function provides predictions for training times only
+	###->interpolate for timepoints in timegrid
+	curves <- exp(-t(apply(predsrsf$ensemble, 1, FUN=function(z) approx(
+        x=predsrsf$timeInterest, y=z, xout=timegrid)$y)))
+	###create breslow-object
+	pred <- new("breslow",  curves = curves,  time = timegrid)
+	###create SurvivalProbs-object embedding the breslow-object
+	pred <- new("SurvivalProbs",  SurvivalProbs = pred)
+	}
+			
+	else stop('Invalid "type" argument.')
+	return(pred)  
+        }
+		
+		
+	###now create customsurvhd-object (obligatory output-object)
+        custommod <- new("ModelCustom", mod=output.rsf, 
+        predfun=predfun, extraData=list())
+		
+	return(custommod)
+	}
+ 
+ \end{Sinput}
+ \end{Schunk}
+ 
+ It is practical to make sure that the custom function in the global environment of {\bf R} such that it is available for all functions of {\bf survHD}. 
+ 
+<<testcustom, results=hide>>=
+###define function in global envir
+assign(x="customRSF", value=customRSF, envir=.GlobalEnv)
+@ 
+
+
+<<precust, echo=F, results=hide>>=
+###test it
+##data
+data(beer.exprs)
+set.seed(123)
+X <- t(as.matrix(beer.exprs))
+data(beer.survival)
+y <- Surv(beer.survival[, 2], beer.survival[, 1])
+@ 
+
+Using the custom function {\bf customRSF} we can easily implement a complete work flow of 
+generating LearningSets,  gene selection,  tuning,  resampling and a final evaluation. 
+
+<<customwf, results=hide>>=
+
+##learningset	
+ls <- generateLearningsets(y=y[, 1], method='CV', fold=5)
+#gene selection
+gsel <- geneSelection(X=X, y=y, method='fastCox', LearningSets=ls, 
+                    criterion='coefficient')
+
+###tune
+tuneres <- tune(X=X, y=y, GeneSel=gsel, nbgene=30, survmethod='customSurv', 
+customSurvModel=customRSF, LearningSets=ls, grids = list(ntree = 20*(1:10)))
+	
+###use tuneres in learnSurvival
+svaggr <- learnSurvival(X=X, y=y, GeneSel=gsel, nbgene=30, survmethod='customSurv', 
+customSurvModel=customRSF, LearningSets=ls, tuneres=tuneres, measure="PErrC", 
+timegrid=4:10, gbm=FALSE, addtune=list(GeneSel=gsel, nbgene=30))
+@ 
+
+The only essential difference is the argument {\bf survmethod} which is set to {\bf 'customSurv'}.
+
+Note that even tuning does not need any additional code apart from defining a reasonable tuning grid
+(argument {\bf grids}) for the {\bf rsf}-specific argument {\bf ntree}.
+The last step is the evaluation where we have to resort to {\bf measure='PErrC'} since it is the only one which can be computed without a linear predictor:
+
+<<customfin>>=
+###error expected because rsf does not provide lp
+try(evaluate(svaggr, measure='CvPLogL'))
+###error expected because rsf does not provide lp
+try(evaluate(svaggr, measure='PErrC', timegrid=3:80, gbm=T))
+###works without lp
+evcust <- evaluate(svaggr, measure='PErrC', timegrid=3:80, gbm=F)	
+@ 
+
+<<custplot, fig=T>>=
+perrcs <- c()
+for(i in 1:5){
+  perrcs <- cbind(perrcs, evcust@result[[i]])
+}
+plot(3:80, rowMeans(perrcs, na.rm=TRUE), , col='blue', lwd=2, 
+     main='RSF Mean Prediction Error Curve on Test Folds', xlab='time', 
+     ylab='Mean Prediction Error', 
+     type='l', ylim=c(0, 0.4), xlim=c(3, 82))
+@ 
+
+
+
+\section{Gene Set Analysis}
+
+It is often of interest to test whether the expression of a particular group
+of genes is associated with some phenotype. This is commonly a phenotype that
+differs between two groups,  for example between a test and a control group. This test
+is easily generalized to different phenotype classes like survival
+outcome by first ranking all genes in a univariate fashion and then testing
+for a non-random ranking of gene sets. We first create a random data set:
+<<gsagendata>>=
+set.seed(100)
+x  <- matrix(rnorm(1000*20), ncol=20)
+dd <- sample(1:1000, size=100)
+
+u  <- matrix(2*rnorm(100), ncol=10, nrow=100)
+x[dd, 11:20] <- x[dd, 11:20]+u
+y <- Surv(c(rnorm(10)+1, rnorm(10)+2),  rep(TRUE,  20))
+
+genenames   <- paste("g", 1:1000, sep="")
+rownames(x) <- genenames
+@
+Now we need some sets of genes which we will test for association with
+outcome. Here we just create some random ones:
+<<gsagensets>>=
+genesets <- vector("list", 50)
+for(i in 1:50){
+    genesets[[i]] <- paste("g", sample(1:1000, size=30), sep="")
+}
+geneset.names <- paste("set", as.character(1:50), sep="")
+@
+A well curated resource of gene sets is the MSigDB. It provides gene sets in
+tab separated files with the suffix gmt. These files can be imported with the
+\texttt{gsaReadGmt} function. For now,  we just create such a gmt data structure
+from the list of random sets:
+<<gsamakegmt>>=
+gmt <- new("gsagenesets",  genesets=genesets,  
+                geneset.names=geneset.names)
+@
+The focus of this package is survival outcome,  so testing gene sets for
+association with survival is simple:
+<<gsarrun>>=
+gsa.res <- gsaWilcoxSurv(gmt, X=x, y=y, cluster=FALSE, p.value=0.3)
+@
+The \texttt{cluster} command can be used to cluster similar gene sets in the
+ranking. The similarity of gene sets can also be explored with the
+\texttt{plot} function and the results are shown in
+Figure~\ref{fig:gsa:overlap}:
+<<gsaplotoverlap>>=
+plot(gsa.res)
+@
+\begin{figure}
+\centering
+<<gsaplotoverlapp, echo=FALSE, fig=TRUE>>=
+plot(gsa.res)
+@
+\caption{GSA overlap plot. This plot visualizes the similarity of gene sets
+that are associated with the phenotype of interest. Note that
+the p-values are not adjusted for multiple testing.}
+\label{fig:gsa:overlap}
+\end{figure}
+Another useful plot is a barplot,  which visualizes the ranking of genes in up
+to two gene sets (Figure~\ref{fig:gsa:barplot}):
+<<gsabarplotp>>=
+plot(gsa.res,  type="barcode", geneset.id1="set22",  
+    geneset.id2="set33")
+@
+
+\begin{figure}
+\centering
+<<gsabarplotp, echo=FALSE, fig=TRUE>>=
+plot(gsa.res,  type="barcode", geneset.id1="set22",  geneset.id2="set33")
+@
+\caption{GSA barplot. The horizontal lines on the bottom visualize the
+positions of up to two different gene sets in a univariate ranking,  colored
+here in red and blue. The plot on the top visualizes the local enrichment.  It
+makes sense to compare two sets in one plot if the gene sets are devided in
+up- and down-regulated genes. This has the advantage that not only
+non-randomness is shown,  but also that the gene expression direction is
+consistent. Red are typically the up-regulated genes,  blue down-regulated
+genes. Genes with high statistic have a high hazard ratio and vice versa.}
+\label{fig:gsa:barplot}
+\end{figure}
+For phenotypes other than survival,  \texttt{gsaWilcoxSurv} accepts a ranking
+of genes. In our example,  we split the data in two groups and test gene sets
+for association with this splitting:
+<<gsattest>>=
+library(genefilter)
+genes.ttest <- rowttests(x,  as.factor(c(rep(1, 10), rep(2, 10))))
+gsa.res.tt  <- gsaWilcoxSurv(gmt,  genenames=rownames(x), 
+    statistics=genes.ttest[, 1])
+@
+All the examples above assume that the rownames of \texttt{X} correspond to
+the names of the genes in the gene sets. Here an example in which the
+rownames of \texttt{X} are Affymetrix probe ids and the genes in the gene set
+official gene symbols:
+<<gsaaffymetrix1>>=
+data(beer.exprs)
+data(beer.survival)
+library(hu6800.db)
+library(annotate)
+
+gmt <- gsaReadGmt(system.file("extdata/ovarian_gene_signatures.gmt",  
+    package = "survHD"))
+@
+We convert the symbols to Affymetrix ids with the \texttt{gsaTranslateGmt}
+function and Bioconductor's annotate package:
+<<gsaaffymetrix2>>=
+genes    <- getSYMBOL(rownames(beer.exprs),  "hu6800")
+gmt.affy <- gsaTranslateGmt(gmt,  beer.exprs,  genes)
+gsa.res  <- gsaWilcoxSurv(gmt.affy,  beer.exprs,  
+                Surv(beer.survival[, 2],  beer.survival[, 1]))
+@
+Note that if a gene is represented by more than one probe set,  this code will
+use the first match in the GSA. It is recommended to use 
+for example the \texttt{collapseRows} function of the WGNCA package to pick
+reasonable probe sets.
+
+
+\clearpage
+\appendix 
+\section{Session Info}
+<<sessioninfo, echo=FALSE, results=tex>>=
+toLatex(sessionInfo())
+@
+
+
+
 \end{document}
-
-
 
 
 

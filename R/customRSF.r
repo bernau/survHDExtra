@@ -24,7 +24,7 @@ customRSF<-function(Xlearn,Ylearn,learnind,...){
 			stop("Random Forests don't provide linear predictors, sorry.")
 		}
 #for typ survprobs the obligatory return class is Breslow
-		else if (type == "survprobs") {
+		else if (type == "SurvivalProbs") {
 			modelobj <- object@mod
 			if (is.null(timegrid)) {
 				stop("No timegrid specified.")
@@ -39,7 +39,7 @@ customRSF<-function(Xlearn,Ylearn,learnind,...){
 			###create breslow-object
 			pred <- new("breslow", curves = curves, time = timegrid)
 			###create survprobs-object embedding the breslow-object
-			pred <- new("survprobs", survprobs = pred)
+			pred <- new("SurvivalProbs", SurvivalProbs = pred)
 		}
 		
 		else stop('Invalid "type" argument.')

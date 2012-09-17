@@ -36,7 +36,9 @@
     \code{\link{gsaWilcoxSurv}}, \code{\link{gsaReadGmt}}
 }
 \examples{
-    require(survHD)
+\dontrun{
+    require(survHDExtra)
     gmt.reactome <- gsaPathwayGmt("reactome")
+    }
 }
 \keyword{GSA}

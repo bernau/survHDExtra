@@ -1,44 +1,32 @@
-\name{superPcSurv}
-\alias{superPcSurv}
-\alias{superPcSurv,ExpressionSet,character-method}
-\alias{superPcSurv,ExpressionSet,Surv-method}
-\alias{superPcSurv,data.frame,Surv-method}
-\alias{superPcSurv,matrix,Surv-method}
+\name{customSuperPc}
+\alias{customSuperPc}
+
 \title{Univarate shrinkage prediction in the Cox model}
 \description{See
   http://cran.r-project.org/web/packages/superpc/index.html for more
   details
 
+Usually, this function is not called directly but embedded in a call to \code{customSurv} from the main package \code{survHD} (see examples).
+
   Note that "lambda", if specified, corresponds to the "threshold"
   argument in superpc.  
 }
 \usage{
-\S4method{superPcSurv}{data.frame,Surv}(X, y, learnind, essential=FALSE ,...)
+customSuperPc(Xlearn, Ylearn, learnind,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
- \item{X}{Gene expression data. The following formats are available:
-  \itemize{
-   \item{\code{matrix}} Rows correspond to observations, columns to variables.
-   \item{\code{data.frame}}  Rows correspond to observations, columns to variables.
-   \item{\code{ExpressionSet}} survHD will extract the expressions using exprs().
-  } }
-  \item{y}{Survival Response, an object of class:
-  \itemize{
-   \item{\code{Surv}} if \code{X} is of type data.frame or matrix
-   \item{\code{character}} if \code{X} is of type \code{ExpressionSet}. In
-   this case \code{y} may be the name of 
-   the survival response in the phenoData of \code{X}. If survival time and indicator are stored separately in the phenoData
-   one can specify a two-element character vector the first element representing the survival time variable.
-          }}
+ \item{Xlearn}{Gene expression data (a \code{data.frame})}
+  
+  \item{Ylearn}{Survival Response, an object of class \code{Surv}.}
+
   
   \item{learnind}{An index vector specifying the observations that
                   belong to the learning set. May be \code{missing};
                   in that case, the learning set consists of all
                   observations and predictions are made on the
                   learning set.}
-                  \item{essential}{shall the model output (see slot model of class \code{\link{ModelLearned}})
-                  include the bare essentials only (especially for tune this option might save a lot of memory)?}
+        
   \item{\dots}{Further arguments that shall be passed to \code{superpc.train}
     function from the superpc R package (http://cran.r-project.org/web/packages/superpc/index.html)
   }
@@ -57,10 +45,9 @@
 \seealso{\code{\link{learnSurvival}}}
 
 \examples{
-\dontrun{
 require(survHD)
 require(survival)
-	
+require(survHDExtra)	
 	set.seed(20)
 	nsamples <- 100
 	X <- matrix(rnorm(nsamples*1000),nrow=nsamples)
@@ -69,10 +56,14 @@ require(survival)
 	time <- rexp(nsamples)
 	cens <- sample(0:1,size=nsamples,replace=TRUE)
 	y <- Surv(time,cens)
+ModelLearned<-customSurv(X=X,y=y,learnind=1:75,customSurvModel=customSuperPc)	
+##linear risk score
+predict(ModelLearned@model,newdata=X[-(1:75),],type='lp')
+##survival probabilities at each uncensored time
+mytimegrid <- sort(c(0.0,y[y[,2]==1,1]))
+SurvivalProbs <- predict(ModelLearned,X[-(1:75),],type='SurvivalProbs',timegrid=mytimegrid,gbm=TRUE)@SurvivalProbs
+plot(SurvivalProbs,xlab="Time", ylab="Probability of Survival")
 
-ModelLearned<-superPcSurv(X=X,y=y,learnind=1:75)	
-
-}
 }
 \keyword{multivariate}
 

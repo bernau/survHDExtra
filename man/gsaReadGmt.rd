@@ -39,6 +39,7 @@
 }
 \examples{
     require(survHD)
+    require(survHDExtra)
     gmt <- gsaReadGmt(system.file("extdata/ovarian_gene_signatures.gmt",
     package = "survHD"))
 }

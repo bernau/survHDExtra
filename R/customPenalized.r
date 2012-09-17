@@ -70,6 +70,7 @@ customPenalized<-function(Xlearn,Ylearn,learnind,...){
 	
 	
 	predfun<-function(object, newdata, type, timegrid = NULL, ...) {
+		require(penalized)
 		##
 		ll <- list(...)  #dots call is not actually used
 		## browser(expr=eval(expression(is.null(object@mod))))

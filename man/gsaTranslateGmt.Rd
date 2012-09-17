@@ -26,6 +26,7 @@
 }
 \examples{
     library(survHD)
+    library(survHDExtra)
     library(hu6800.db)
     library(annotate)
 

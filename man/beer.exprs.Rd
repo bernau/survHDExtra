@@ -20,6 +20,7 @@ data(beer.exprs)
   Irizarry, R.A., et al. (2003) Summaries of Affymetrix GeneChip probe level data, Nucl. Acids Res., 31, e15+-e15+.
 }
 \examples{
+library(survHDExtra)
 data(beer.exprs)
 mysd <- apply(beer.exprs,1,sd)
 %%##100 most changing probesets
