@@ -1,7 +1,7 @@
 \name{gsaWilcoxSurv-methods}
 \docType{methods}
 \alias{gsaWilcoxSurv-methods}
-\title{General method for performing a Gene Set Analysis (GSA)}
+\title{General method for performing a Gene Set Analysis (GSA), experimental implementation}
 \description{ 
     Performs gene selection for the following signatures:
 }

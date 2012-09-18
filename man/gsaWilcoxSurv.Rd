@@ -6,7 +6,7 @@
 \alias{gsaWilcoxSurv,gsagenesets,data.frame,Surv,missing,missing-method}
 \alias{gsaWilcoxSurv,list,missing,missing,character,numeric-method}
 \alias{gsaWilcoxSurv,list,ANY,Surv,missing,missing-method}
-\title{Gene Set Analysis GSA}
+\title{Gene Set Analysis GSA, experimental implementation}
 \description{ 
     Test whether a set of genes is highly ranked relative to other
     genes in terms of a given statistic, for example a ranking based on univariate
