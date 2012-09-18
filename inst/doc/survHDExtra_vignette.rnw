@@ -158,8 +158,12 @@ Formal class 'LinearPrediction' [package "survHD"] with 1 slots
 \begin{Sinput}
 >  str(SurvivalProbs, max.level=2)
 \end{Sinput}
+\begin{Soutput}
+Formal class 'SurvivalProbs' [package "survHD"] with 1 slots
+  ..@ SurvivalProbs:Formal class 'breslow' [package "penalized"] with 2 slots
+\end{Soutput}
 \end{Schunk}
- 
+
 
  The prediction function has to accept four arguments:
  
