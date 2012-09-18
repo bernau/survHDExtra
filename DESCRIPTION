@@ -2,8 +2,8 @@ Package: survHDExtra
 Type: Package
 Title: Addtitional Features for package survHD
 Version: 0.1.0
-Date: 2009-09-14
-Author: Christoph Bernau <bernau@ibe.med.uni-muenchen.de>, Levi Waldron <>
+Date: 2012-09-18
+Author: Christoph Bernau <bernau@ibe.med.uni-muenchen.de>, Levi Waldron <lwaldron.research@gmail.com>, Markus Riester <markus@jimmy.harvard.edu>
 Maintainer: Christoph Bernau <bernau@ibe.med.uni-muenchen.de>
 Depends: R (>= 2.10), survHD, methods, stats, Biobase, survival,penalized, Hmisc, survC1
 Imports: BiocGenerics
