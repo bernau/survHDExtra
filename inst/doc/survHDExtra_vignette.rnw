@@ -148,7 +148,6 @@ In order to provide outputs which can be evaluated and processed by {\bf survHD}
  
 \begin{Schunk}
 \begin{Sinput}
->  LinearPrediction <- predict(coxboostmodel, newdata=Xtest, type='lp')[[1]]
 >  str(LinearPrediction, max.level=2)
 \end{Sinput}
 \begin{Soutput}
@@ -157,8 +156,6 @@ Formal class 'LinearPrediction' [package "survHD"] with 1 slots
   .. ..- attr(*,  "names")= chr [1:26] "L59" "L61" "L62" "L64" ...
 \end{Soutput}
 \begin{Sinput}
->  SurvivalProbs <- predict(coxboostmodel, newdata=Xtest, type='SurvivalProbs', 
-+  timegrid=3:80)[[1]]
 >  str(SurvivalProbs, max.level=2)
 \end{Sinput}
 \end{Schunk}
@@ -167,7 +164,7 @@ Formal class 'LinearPrediction' [package "survHD"] with 1 slots
  The prediction function has to accept four arguments:
  
  \begin{itemize}
- \item {\bf object:} an object of class {\bf ModelCustom} which is created by the {\bf survHD} automatically and contains the fitted model (here: {\bf output.rsf}) in its slot {\bf mod}.
+ \item {\bf object:} an object of class {\bf ModelCustom} which is created by {\bf survHD} automatically and contains the fitted model (here: {\bf output.rsf}) in its slot {\bf mod}.
  \item {\bf newdata:} {\bf data.frame} of geneexpressions for the observations for which predictions shall be performed. 
  \item {\bf type:} indicates whether linear predictors ({\bf 'lp'} or survival probabilities ({\bf 'SurvivalProbs'}) shall be predicted
    \item {\bf timegrid:} if {\bf type='SurvivalProbs'} this argument specifies the time points at which predictions shall be performed
